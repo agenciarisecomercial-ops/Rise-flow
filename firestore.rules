@@ -1,0 +1,21 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Rise Flow fica isolado e exige login.
+    match /riseFlow/{workspace}/{document=**} {
+      allow read, write: if request.auth != null;
+    }
+
+    // COMPATIBILIDADE TEMPORÁRIA:
+    // mantém as outras coleções funcionando como funcionavam antes,
+    // sem liberar a coleção riseFlow.
+    //
+    // ATENÇÃO: isso mantém os outros apps públicos, como estavam anteriormente.
+    // O ideal depois é criar regras específicas para cada app.
+    match /{collection}/{document=**} {
+      allow read, write: if collection != "riseFlow";
+    }
+  }
+}
